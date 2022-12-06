@@ -30,13 +30,12 @@ function pipe {
   echo "$comment"
   echo "$node_from [shape=point]"
   echo "$node_from -> $node_to [label=\"$name\", penwidth=3, dir=none]"
-  echo ""
 }
 
 function fork {
   local node_from="$1"
   shift
-  
+
   echo "// Fork: $node_from splits in $#"
   for node_to in $@ ; do
     echo "$node_from -> $node_to"
@@ -50,25 +49,32 @@ function string_down {
     t=${node_from}_${floor}
     pipe r${floor}p $f $t
     f=$t
-  done 
+  done
 }
 
 # Component NodeFrom NodeTo #Comment
 pipe Rør Po P5         // Rør op til 5te sal
-pipe Rør P5 M37H       // Rør til Manifold KG37 Højre
-pipe Rør P5 M37V       // Rør til Manifold KG37 Venstre
 
-fork M37H  S37H_kgA S37H_kgB S37H_yard
-string_down S37H_kgA; pipe Rør S37H_kgA_0 ret
-string_down S37H_kgB; pipe Rør S37H_kgB_0 ret
-string_down S37H_yard; pipe Rør S37H_yard_0 ret
+function opgang {
+  local name="$1"
+  local from="$2"
+  local to="$3"
+  pipe Rør $from M${name}  // Rør til Manifold ${name}
+  fork M${name}  S${name}_kgA S${name}_kgB S${name}_yard
+  string_down S${name}_kgA; pipe Rør S${name}_kgA_0 $to
+  string_down S${name}_kgB; pipe Rør S${name}_kgB_0 $to
+  string_down S${name}_yard; pipe Rør S${name}_yard_0 $to
+}
 
-fork M37V  S37V_kgA S37V_kgB S37V_yard
-string_down S37V_kgA; pipe Rør S37V_kgA_0 ret
-string_down S37V_kgB; pipe Rør S37V_kgB_0 ret
-string_down S37V_yard; pipe Rør S37V_yard_0 ret
+opgang 37V P5 ret; opgang 37H P5 ret
+opgang 42V P5 ret; opgang 42H P5 ret
+opgang 44V P5 ret; opgang 44H P5 ret
+opgang 95V P5 ret; opgang 95H P5 ret
+opgang 97V P5 ret; opgang 97H P5 ret
+opgang 99V P5 ret; opgang 99H P5 ret
+opgang 101V P5 ret; opgang 101H P5 ret
+opgang 103V P5 ret; opgang 103H P5 ret
 
 pipe Rør ret Pi
 
 comp Hovedpumpe Pi Po  // Cirkulationspumpe som flytter vandet rundt i et lukket loop
-
