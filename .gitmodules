@@ -1,0 +1,3 @@
+[submodule "pypeflow"]
+	path = pypeflow
+	url = https://github.com/TomLXXVI/pypeflow.git
